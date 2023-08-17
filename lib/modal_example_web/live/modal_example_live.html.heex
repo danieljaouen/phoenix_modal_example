@@ -1,8 +1,26 @@
 <div class="begin-modal">
-  <div class="modal-content">
-    <h2>Welcome to the Multi-Part Modal Example!</h2>
+  <div id="modal-1" class="displayed" phx-remove={show_modal_2()} phx-update="ignore">
+    <h2>Welcome to the Multi-Part Modal Example Part 1!</h2>
     <div class="modal-footer">
-      <button phx-click="close-modal">Next</button>
+      <.button phx-click={show_modal_2()}>Next</.button>
+    </div>
+  </div>
+
+  <div id="modal-2" class="hidden" phx-remove={show_modal_3()} phx-update="ignore">
+    <h2>Welcome to the Multi-Part Modal Example Part 2!</h2>
+    <div class="modal-footer">
+      <.button phx-click={show_modal_1()}>Back</.button>
+      <.button phx-click={show_modal_3()}>Next</.button>
+    </div>
+  </div>
+
+  <div id="modal-3" class="hidden" phx-update="ignore">
+    <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
+    <div class="modal-footer">
+      <.button phx-click={show_modal_2()}>Back</.button>
+      <.link patch={~p"/submit"}>
+        <.button>Submit</.button>
+      </.link>
     </div>
   </div>
 </div>
