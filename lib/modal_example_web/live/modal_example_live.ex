@@ -3,15 +3,6 @@ defmodule ModalExampleWeb.ModalExampleLive do
 
   def render(assigns) do
     ~L"""
-    <div class="begin-modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Welcome to the Multi-Part Modal Example!</h2>
-        <div class="modal-footer">
-          <button phx-click="close-modal">Next</button>
-        </div>
-      </div>
-    </div>
     """
   end
 
