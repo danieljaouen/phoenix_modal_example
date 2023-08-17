@@ -1,13 +1,51 @@
 defmodule ModalExampleWeb.ModalExampleLive do
+  alias Phoenix.HTML.Form
+
   use ModalExampleWeb, :live_view
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, modal_open: false)}
+    form1_map = %{"email" => ""}
+
+    form2_map = %{
+      "full_name" => "",
+      "address1" => "",
+      "address2" => "",
+      "city" => "",
+      "state" => "",
+      "zip" => ""
+    }
+
+    form1 = to_form(form1_map)
+    form2 = to_form(form2_map)
+
+    {:ok, assign(socket, form1: form1, form2: form2)}
+  end
+
+  def handle_event("validate", params, socket) do
+    form1 = socket.assigns.form1
+    form2 = socket.assigns.form2
+
+    form1 =
+      if Map.get(params, "email") do
+        validate_form1(form1, params)
+      else
+        form1
+      end
+
+    form2 =
+      if !Map.get(params, "email") do
+        validate_form2(form2, params)
+      else
+        form2
+      end
+
+    {:noreply, assign(socket, form1: form1, form2: form2)}
   end
 
   def handle_params(params, url, socket) do
     if url =~ ~p"/submit" do
-      # save_form(socket.form)
+      save_form(socket.assigns.form1, socket.assigns.form2)
+
       {
         :noreply,
         socket
@@ -40,5 +78,47 @@ defmodule ModalExampleWeb.ModalExampleLive do
     |> JS.hide(transition: "fade-out", to: "#modal-1")
     |> JS.hide(transition: "fade-out", to: "#modal-2")
     |> JS.show(transition: "fade-in", to: "#modal-3")
+  end
+
+  defp save_form(form1, form2) do
+    IO.inspect(form1)
+    IO.inspect(form2)
+  end
+
+  def check_field_is_blank(field) do
+    fn form -> form[field] == "" end
+  end
+
+  def check_email_regex(form) do
+    !String.match?(form[:email].value, ~r/@/)
+  end
+
+  def validate_form1(_form1, params) do
+    params
+    |> validate()
+    |> put_error("email", "Email is required", check_field_is_blank("email"))
+    |> put_error("email", "Email is invalid", &check_email_regex/1)
+  end
+
+  def validate_form2(_form2, params) do
+    params
+    |> validate()
+    |> put_error("full_name", "Full name is required", check_field_is_blank("full_name"))
+    |> put_error("address1", "Address is required", check_field_is_blank("address1"))
+    |> put_error("city", "City is required", check_field_is_blank("city"))
+    |> put_error("state", "State is required", check_field_is_blank("state"))
+    |> put_error("zip", "Zip is required", check_field_is_blank("zip"))
+  end
+
+  def validate(params) do
+    to_form(params)
+  end
+
+  def put_error(form, field, message, condition) do
+    if condition.(form) do
+      form
+    else
+      %Form{form | errors: ["#{field}": {message, %{}}]}
+    end
   end
 end

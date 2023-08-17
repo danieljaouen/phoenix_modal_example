@@ -8,19 +8,42 @@
 
   <div id="modal-2" class="hidden" phx-remove={show_modal_3()} phx-update="ignore">
     <h2>Welcome to the Multi-Part Modal Example Part 2!</h2>
-    <div class="modal-footer">
-      <.button phx-click={show_modal_1()}>Back</.button>
-      <.button phx-click={show_modal_3()}>Next</.button>
-    </div>
+    <.simple_form
+      for={@form1}
+      id="form1"
+      phx-target="ignore"
+      phx-submit="save"
+    >
+      <.input field={@form1[:email]} phx-change="validate" type="email" label="Email" />
+      <:actions>
+        <.button phx-click={show_modal_1()}>Back</.button>
+        <.button phx-click={show_modal_3()}>Next</.button>
+      </:actions>
+    </.simple_form>
   </div>
 
   <div id="modal-3" class="hidden" phx-update="ignore">
     <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
+    <.simple_form
+      for={@form2}
+      id="form2"
+      phx-target="ignore"
+      phx-submit="save"
+    >
+      <.input field={@form2[:full_name]} phx-change="validate" type="text" label="Full Name" />
+      <.input field={@form2[:address1]} phx-change="validate" type="text" label="Address 1" />
+      <.input field={@form2[:address2]} phx-change="validate" type="text" label="Address 2" />
+      <.input field={@form2[:city]} phx-change="validate" type="text" label="City" />
+      <.input field={@form2[:state]} phx-change="validate" type="text" label="State" />
+      <.input field={@form2[:zip]} phx-change="validate" type="text" label="Zip Code" />
+      <:actions>
+        <.button phx-click={show_modal_2()}>Back</.button>
+        <.link patch={~p"/submit"}>
+          <.button>Submit</.button>
+        </.link>
+      </:actions>
+    </.simple_form>
     <div class="modal-footer">
-      <.button phx-click={show_modal_2()}>Back</.button>
-      <.link patch={~p"/submit"}>
-        <.button>Submit</.button>
-      </.link>
     </div>
   </div>
 </div>
