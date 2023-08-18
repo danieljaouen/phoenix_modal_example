@@ -1,7 +1,6 @@
 <div class="begin-modal">
   <div id="modal-1"
        class={if @page == "1" do "show" else "hidden" end}
-       phx-remove={show_modal_2()}
        phx-update="ignore">
 
     <h2>Welcome to the Multi-Part Modal Example Part 1!</h2>
@@ -14,7 +13,6 @@
 
   <div id="modal-2"
        class={if @page == "2" do "show" else "hidden" end}
-       phx-remove={show_modal_3()}
        phx-update="ignore">
 
     <h2>Welcome to the Multi-Part Modal Example Part 2!</h2>
@@ -24,10 +22,13 @@
       phx-change="validate"
       phx-submit="save"
     >
-      <.input field={@form1[:email]} type="email" label="Email" />
+      <.input field={@form1[:email]} type="email" label="Email" required />
+      <.input field={@form1[:completed]} type="hidden" checked />
       <:actions>
-        <.button phx-click={show_modal_1()}>Back</.button>
-        <.button phx-click={show_modal_3()}>Next</.button>
+        <.link patch={~p"/?page=1"}>
+          <.button>Back</.button>
+        </.link>
+        <.button>Next</.button>
       </:actions>
     </.simple_form>
   </div>
@@ -37,38 +38,45 @@
        phx-update="ignore">
 
     <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
-    <%= if @form1.errors || @form2.errors do %>
-      <div class="alert alert-danger">
-        <ul>
-          <%= for {field, message} <- @form1.errors do %>
-            <li><%= translate_error(message) %></li>
-          <% end %>
-          <%= for {field, message} <- @form2.errors do %>
-            <li><%= translate_error(message) %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+
     <.simple_form
       for={@form2}
       id="form2"
       phx-change="validate"
       phx-submit="save"
     >
-      <.input field={@form2[:full_name]} type="text" label="Full Name" />
-      <.input field={@form2[:address1]} type="text" label="Address 1" />
-      <.input field={@form2[:address2]} type="text" label="Address 2" />
-      <.input field={@form2[:city]} type="text" label="City" />
-      <.input field={@form2[:state]} type="text" label="State" />
-      <.input field={@form2[:zip]} type="text" label="Zip Code" />
+      <.input field={@form2[:full_name]}
+              type="text"
+              label="Full Name"
+              required />
+      <.input field={@form2[:address1]}
+              type="text"
+              label="Address 1"
+              required />
+      <.input field={@form2[:address2]}
+              type="text"
+              label="Address 2" />
+      <.input field={@form2[:city]}
+              type="text"
+              label="City"
+              required />
+      <.input field={@form2[:state]}
+              type="text"
+              label="State"
+              required />
+      <.input field={@form2[:zip]}
+              type="text"
+              label="Zip Code"
+              required />
+      <.input field={@form2[:completed]}
+              type="hidden"
+              checked />
       <:actions>
-        <.button phx-click={show_modal_2()}>Back</.button>
-        <.link patch={~p"/submit"}>
-          <.button>Submit</.button>
+        <.link patch={~p"/?page=2"}>
+          <.button>Back</.button>
         </.link>
+        <.button>Submit</.button>
       </:actions>
     </.simple_form>
-    <div class="modal-footer">
-    </div>
   </div>
 </div>
