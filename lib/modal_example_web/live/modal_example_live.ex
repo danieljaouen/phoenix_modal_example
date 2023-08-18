@@ -121,11 +121,6 @@ defmodule ModalExampleWeb.ModalExampleLive do
         form2
       end
 
-    IO.puts("[Form 1 errors, Form 2 errors]")
-    IO.inspect([form1.errors, form2.errors])
-    IO.puts("Form 1 email errors")
-    IO.inspect(form1[:email].errors)
-
     {
       :noreply,
       assign(

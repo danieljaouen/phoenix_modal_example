@@ -1,7 +1,6 @@
 <div class="begin-modal">
   <div id="modal-1"
-       class={if @page == "1" do "show" else "hidden" end}
-       phx-update="ignore">
+       class={if @page == "1" do "show" else "hidden" end}>
 
     <h2>Welcome to the Multi-Part Modal Example Part 1!</h2>
     <div class="modal-footer">
@@ -12,8 +11,7 @@
   </div>
 
   <div id="modal-2"
-       class={if @page == "2" do "show" else "hidden" end}
-       phx-update="ignore">
+       class={if @page == "2" do "show" else "hidden" end}>
 
     <h2>Welcome to the Multi-Part Modal Example Part 2!</h2>
     <.simple_form
@@ -26,7 +24,6 @@
               label="Email"
               phx-change="validate"
               required />
-      <%= "#{inspect(@form1[:email].errors)}" %>
       <.input field={@form1[:completed]} type="hidden" checked />
       <:actions>
         <.link patch={~p"/?page=1"}>
@@ -38,8 +35,7 @@
   </div>
 
   <div id="modal-3"
-       class={if @page == "3" do "show" else "hidden" end}
-       phx-update="ignore">
+       class={if @page == "3" do "show" else "hidden" end}>
 
     <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
 
