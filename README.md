@@ -1,4 +1,4 @@
-# ModalExample
+# Multi-Part Modal Example
 
 To start your this simple multi-part form example:
 
