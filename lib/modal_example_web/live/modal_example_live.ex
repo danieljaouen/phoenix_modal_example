@@ -91,7 +91,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
       Enum.into(
         Enum.map(
           new_seen_params,
-          fn {k, v} -> {"#{k}", params[k] || seen_params[k]} end
+          fn {k, _v} -> {"#{k}", params[k] || seen_params[k]} end
         ),
         %{}
       )
@@ -100,7 +100,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
       Enum.into(
         Enum.map(
           seen_params,
-          fn {k, v} -> {"#{k}", params[k] || new_seen_params[k]} end
+          fn {k, _v} -> {"#{k}", params[k] || new_seen_params[k]} end
         ),
         %{}
       )
@@ -151,43 +151,75 @@ defmodule ModalExampleWeb.ModalExampleLive do
         to_form(params)
       end
 
-    if page == "3" do
-      save_form(form1, form2)
-    end
+    new_params =
+      params
+      |> Map.delete("_target")
 
-    page =
-      if page == "1" do
-        "2"
+    form1 =
+      if Map.get(params, "email") do
+        validate_form1(to_form(new_params), params)
       else
-        if page == "2" do
-          "3"
-        else
-          "1"
-        end
+        form1
       end
 
-    if page == "1" do
+    form2 =
+      if !Map.get(params, "email") do
+        validate_form2(to_form(new_params), params)
+      else
+        form2
+      end
+
+    if length(form1.errors) != 0 || length(form2.errors) != 0 do
+      # If there are errors, we want to show the user
       {
         :noreply,
-        redirect(socket, to: ~p"/")
+        assign(
+          socket,
+          form1: form1,
+          form2: form2,
+          page: page
+        )
       }
     else
-      if page == "2" do
+      # no errors, so submit the form
+      if page == "3" do
+        save_form(form1, form2)
+      end
+
+      page =
+        if page == "1" do
+          "2"
+        else
+          if page == "2" do
+            "3"
+          else
+            "1"
+          end
+        end
+
+      if page == "1" do
         {
           :noreply,
-          push_patch(
-            assign(socket, form1: form1, form2: form2, page: page),
-            to: ~p"/?page=2"
-          )
+          redirect(socket, to: ~p"/")
         }
       else
-        {
-          :noreply,
-          push_patch(
-            assign(socket, form1: form1, form2: form2, page: page),
-            to: ~p"/?page=3"
-          )
-        }
+        if page == "2" do
+          {
+            :noreply,
+            push_patch(
+              assign(socket, form1: form1, form2: form2, page: page),
+              to: ~p"/?page=2"
+            )
+          }
+        else
+          {
+            :noreply,
+            push_patch(
+              assign(socket, form1: form1, form2: form2, page: page),
+              to: ~p"/?page=3"
+            )
+          }
+        end
       end
     end
   end
@@ -222,7 +254,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
     |> put_error("zip", "Zip is required", check_field_isnt_blank("zip"))
   end
 
-  def validate(form, params) do
+  def validate(form, _params) do
     form
   end
 
