@@ -18,7 +18,6 @@
       for={@form1}
       id="form1"
       phx-submit="save1"
-      phx-change="validate_form1"
     >
       <.input field={@form1[:email]}
               type="email"
@@ -42,7 +41,6 @@
     <.simple_form
       for={@form2}
       id="form2"
-      phx-change="validate_form2"
       phx-submit="save2"
     >
       <.input field={@form2[:full_name]}

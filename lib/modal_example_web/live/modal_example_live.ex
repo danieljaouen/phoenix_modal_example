@@ -137,22 +137,6 @@ defmodule ModalExampleWeb.ModalExampleLive do
     }
   end
 
-  def handle_event("validate_form1", params, socket) do
-    form1 = to_form(params)
-    form2 = socket.assigns.form2
-    seen_params = socket.assigns.seen_params
-
-    {
-      :noreply,
-      assign(
-        socket,
-        form1: form1,
-        form2: form2,
-        seen_params: seen_params
-      )
-    }
-  end
-
   def handle_event("validate2", params, socket) do
     form1 = socket.assigns.form1
 
@@ -171,28 +155,11 @@ defmodule ModalExampleWeb.ModalExampleLive do
     }
   end
 
-  def handle_event("validate_form2", params, socket) do
-    form1 = socket.assigns.form1
-    form2 = to_form(params)
-    seen_params = socket.assigns.seen_params
-
-    {
-      :noreply,
-      assign(
-        socket,
-        form1: form1,
-        form2: form2,
-        seen_params: seen_params
-      )
-    }
-  end
-
   def handle_event("save1", params, socket) do
     form2 = socket.assigns.form2
     page = socket.assigns.page
-    seen_params = socket.assigns.seen_params
+    seen_params = params
 
-    IO.inspect(params)
     form1 = validate_form1(to_form(params), params)
 
     if length(form1.errors) != 0 do
@@ -223,9 +190,8 @@ defmodule ModalExampleWeb.ModalExampleLive do
   def handle_event("save2", params, socket) do
     form1 = socket.assigns.form1
     page = socket.assigns.page
-    seen_params = socket.assigns.seen_params
+    seen_params = params
 
-    IO.inspect(params)
     form2 = validate_form2(to_form(params), params)
 
     if length(form2.errors) != 0 do
