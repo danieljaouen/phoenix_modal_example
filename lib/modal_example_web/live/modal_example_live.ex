@@ -4,7 +4,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
   use ModalExampleWeb, :live_view
 
   def mount(_params, _session, socket) do
-    form1_map = %{"email" => ""}
+    form1_map = %{"email" => "", "completed" => false}
 
     form2_map = %{
       "full_name" => "",
@@ -12,13 +12,22 @@ defmodule ModalExampleWeb.ModalExampleLive do
       "address2" => "",
       "city" => "",
       "state" => "",
-      "zip" => ""
+      "zip" => "",
+      "completed" => false
     }
 
     form1 = to_form(form1_map)
     form2 = to_form(form2_map)
 
-    {:ok, assign(socket, form1: form1, form2: form2)}
+    {
+      :ok,
+      assign(
+        socket,
+        form1: form1,
+        form2: form2,
+        page: 1
+      )
+    }
   end
 
   def handle_event("save", params, socket) do
@@ -64,6 +73,8 @@ defmodule ModalExampleWeb.ModalExampleLive do
   end
 
   def handle_params(params, url, socket) do
+    page = Map.get(params, "page") || "1"
+
     if url =~ ~p"/submit" do
       save_form(socket.assigns.form1, socket.assigns.form2)
 
@@ -75,7 +86,10 @@ defmodule ModalExampleWeb.ModalExampleLive do
     else
       {
         :noreply,
-        socket
+        assign(
+          socket,
+          page: page
+        )
       }
     end
   end

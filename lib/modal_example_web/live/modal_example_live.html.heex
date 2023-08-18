@@ -1,12 +1,22 @@
 <div class="begin-modal">
-  <div id="modal-1" class="displayed" phx-remove={show_modal_2()} phx-update="ignore">
+  <div id="modal-1"
+       class={if @page == "1" do "show" else "hidden" end}
+       phx-remove={show_modal_2()}
+       phx-update="ignore">
+
     <h2>Welcome to the Multi-Part Modal Example Part 1!</h2>
     <div class="modal-footer">
-      <.button phx-click={show_modal_2()}>Next</.button>
+      <.link patch={~p"/?page=2"}>
+        <.button>Next</.button>
+      </.link>
     </div>
   </div>
 
-  <div id="modal-2" class="hidden" phx-remove={show_modal_3()} phx-update="ignore">
+  <div id="modal-2"
+       class={if @page == "2" do "show" else "hidden" end}
+       phx-remove={show_modal_3()}
+       phx-update="ignore">
+
     <h2>Welcome to the Multi-Part Modal Example Part 2!</h2>
     <.simple_form
       for={@form1}
@@ -22,7 +32,10 @@
     </.simple_form>
   </div>
 
-  <div id="modal-3" class="hidden" phx-update="ignore">
+  <div id="modal-3"
+       class={if @page == "3" do "show" else "hidden" end}
+       phx-update="ignore">
+
     <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
     <%= if @form1.errors || @form2.errors do %>
       <div class="alert alert-danger">
