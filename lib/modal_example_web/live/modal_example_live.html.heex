@@ -17,13 +17,14 @@
     <.simple_form
       for={@form1}
       id="form1"
-      phx-submit="save"
+      phx-submit="save1"
+      phx-change="validate_form1"
     >
       <.input field={@form1[:email]}
               type="email"
               label="Email"
-              phx-change="validate" />
-      <.input field={@form1[:completed]} type="hidden" checked />
+              phx-change="validate1" />
+      <.input name="completed" value="true" type="hidden" checked />
       <:actions>
         <.link patch={~p"/?page=1"}>
           <.button>Back</.button>
@@ -41,34 +42,34 @@
     <.simple_form
       for={@form2}
       id="form2"
-      phx-submit="save"
+      phx-change="validate_form2"
+      phx-submit="save2"
     >
       <.input field={@form2[:full_name]}
               type="text"
               label="Full Name"
-              phx-change="validate" />
+              phx-change="validate2" />
       <.input field={@form2[:address1]}
               type="text"
               label="Address 1"
-              phx-change="validate" />
+              phx-change="validate2" />
       <.input field={@form2[:address2]}
               type="text"
-              label="Address 2" />
+              label="Address 2"
+              phx-change="validate2" />
       <.input field={@form2[:city]}
               type="text"
               label="City"
-              phx-change="validate" />
+              phx-change="validate2" />
       <.input field={@form2[:state]}
               type="text"
               label="State"
-              phx-change="validate" />
+              phx-change="validate2" />
       <.input field={@form2[:zip]}
               type="text"
               label="Zip Code"
-              phx-change="validate" />
-      <.input field={@form2[:completed]}
-              type="hidden"
-              checked />
+              phx-change="validate2" />
+      <.input name="completed" value="true" type="hidden" checked />
       <:actions>
         <.link patch={~p"/?page=2"}>
           <.button>Back</.button>

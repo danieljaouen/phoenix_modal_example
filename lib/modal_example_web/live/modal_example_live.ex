@@ -68,10 +68,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
     end
   end
 
-  def handle_event("validate", params, socket) do
-    form1 = socket.assigns.form1
-    form2 = socket.assigns.form2
-
+  def get_seen_params(params, socket) do
     seen_params = socket.assigns.seen_params
 
     new_seen_params =
@@ -81,7 +78,7 @@ defmodule ModalExampleWeb.ModalExampleLive do
     new_seen_params =
       Enum.into(
         Enum.map(
-          socket.assigns.seen_params,
+          seen_params,
           &{"#{elem(&1, 0)}", params[&1]}
         ),
         new_seen_params
@@ -91,7 +88,14 @@ defmodule ModalExampleWeb.ModalExampleLive do
       Enum.into(
         Enum.map(
           new_seen_params,
-          fn {k, _v} -> {"#{k}", params[k] || seen_params[k]} end
+          fn {k, _v} ->
+            {"#{k}",
+             if params[k] do
+               params[k]
+             else
+               seen_params[k]
+             end}
+          end
         ),
         %{}
       )
@@ -100,26 +104,27 @@ defmodule ModalExampleWeb.ModalExampleLive do
       Enum.into(
         Enum.map(
           seen_params,
-          fn {k, _v} -> {"#{k}", params[k] || new_seen_params[k]} end
+          fn {k, _v} ->
+            {"#{k}",
+             if params[k] do
+               params[k]
+             else
+               new_seen_params[k]
+             end}
+          end
         ),
         %{}
       )
 
-    seen_params = Map.merge(seen_params, new_seen_params)
+    Map.merge(seen_params, new_seen_params)
+  end
 
-    form1 =
-      if Map.get(params, "email") do
-        validate_form1(to_form(seen_params), params)
-      else
-        form1
-      end
+  def handle_event("validate1", params, socket) do
+    form2 = socket.assigns.form2
 
-    form2 =
-      if !Map.get(params, "email") do
-        validate_form2(to_form(seen_params), params)
-      else
-        form2
-      end
+    seen_params = get_seen_params(params, socket)
+
+    form1 = validate_form1(to_form(seen_params), params)
 
     {
       :noreply,
@@ -132,44 +137,65 @@ defmodule ModalExampleWeb.ModalExampleLive do
     }
   end
 
-  def handle_event("save", params, socket) do
+  def handle_event("validate_form1", params, socket) do
+    form1 = to_form(params)
+    form2 = socket.assigns.form2
+    seen_params = socket.assigns.seen_params
+
+    {
+      :noreply,
+      assign(
+        socket,
+        form1: form1,
+        form2: form2,
+        seen_params: seen_params
+      )
+    }
+  end
+
+  def handle_event("validate2", params, socket) do
     form1 = socket.assigns.form1
+
+    seen_params = get_seen_params(params, socket)
+
+    form2 = validate_form2(to_form(seen_params), params)
+
+    {
+      :noreply,
+      assign(
+        socket,
+        form1: form1,
+        form2: form2,
+        seen_params: seen_params
+      )
+    }
+  end
+
+  def handle_event("validate_form2", params, socket) do
+    form1 = socket.assigns.form1
+    form2 = to_form(params)
+    seen_params = socket.assigns.seen_params
+
+    {
+      :noreply,
+      assign(
+        socket,
+        form1: form1,
+        form2: form2,
+        seen_params: seen_params
+      )
+    }
+  end
+
+  def handle_event("save1", params, socket) do
     form2 = socket.assigns.form2
     page = socket.assigns.page
+    seen_params = socket.assigns.seen_params
 
-    form1 =
-      if Map.get(params, "email") do
-        to_form(params)
-      else
-        form1
-      end
+    IO.inspect(params)
+    form1 = validate_form1(to_form(params), params)
 
-    form2 =
-      if Map.get(params, "email") do
-        form2
-      else
-        to_form(params)
-      end
-
-    new_params =
-      params
-      |> Map.delete("_target")
-
-    form1 =
-      if Map.get(params, "email") do
-        validate_form1(to_form(new_params), params)
-      else
-        form1
-      end
-
-    form2 =
-      if !Map.get(params, "email") do
-        validate_form2(to_form(new_params), params)
-      else
-        form2
-      end
-
-    if length(form1.errors) != 0 || length(form2.errors) != 0 do
+    if length(form1.errors) != 0 do
       # If there are errors, we want to show the user
       {
         :noreply,
@@ -177,50 +203,52 @@ defmodule ModalExampleWeb.ModalExampleLive do
           socket,
           form1: form1,
           form2: form2,
-          page: page
+          page: page,
+          seen_params: seen_params
         )
       }
     else
-      # no errors, so submit the form
-      if page == "3" do
-        save_form(form1, form2)
-      end
+      page = "3"
 
-      page =
-        if page == "1" do
-          "2"
-        else
-          if page == "2" do
-            "3"
-          else
-            "1"
-          end
-        end
+      {
+        :noreply,
+        push_patch(
+          assign(socket, form1: form1, form2: form2, page: page),
+          to: ~p"/?page=3"
+        )
+      }
+    end
+  end
 
-      if page == "1" do
-        {
-          :noreply,
-          redirect(socket, to: ~p"/")
-        }
-      else
-        if page == "2" do
-          {
-            :noreply,
-            push_patch(
-              assign(socket, form1: form1, form2: form2, page: page),
-              to: ~p"/?page=2"
-            )
-          }
-        else
-          {
-            :noreply,
-            push_patch(
-              assign(socket, form1: form1, form2: form2, page: page),
-              to: ~p"/?page=3"
-            )
-          }
-        end
-      end
+  def handle_event("save2", params, socket) do
+    form1 = socket.assigns.form1
+    page = socket.assigns.page
+    seen_params = socket.assigns.seen_params
+
+    IO.inspect(params)
+    form2 = validate_form2(to_form(params), params)
+
+    if length(form2.errors) != 0 do
+      # If there are errors, we want to show the user
+      {
+        :noreply,
+        assign(
+          socket,
+          form1: form1,
+          form2: form2,
+          page: page,
+          seen_params: seen_params
+        )
+      }
+    else
+      page = "1"
+      save_form(form1, form2)
+      socket = assign(socket, form1: form1, form2: form2, page: page)
+
+      {
+        :noreply,
+        redirect(socket, to: ~p"/")
+      }
     end
   end
 
