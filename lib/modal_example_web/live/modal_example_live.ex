@@ -21,13 +21,16 @@ defmodule ModalExampleWeb.ModalExampleLive do
     form1 = to_form(form1_map)
     form2 = to_form(form2_map)
 
+    seen_params = %{}
+
     {
       :ok,
       assign(
         socket,
         form1: form1,
         form2: form2,
-        page: 1
+        page: 1,
+        seen_params: seen_params
       )
     }
   end
@@ -69,21 +72,66 @@ defmodule ModalExampleWeb.ModalExampleLive do
     form1 = socket.assigns.form1
     form2 = socket.assigns.form2
 
+    seen_params = socket.assigns.seen_params
+
+    new_seen_params =
+      params
+      |> Map.delete("_target")
+
+    new_seen_params =
+      Enum.into(
+        Enum.map(
+          socket.assigns.seen_params,
+          &{"#{elem(&1, 0)}", params[&1]}
+        ),
+        new_seen_params
+      )
+
+    new_seen_params =
+      Enum.into(
+        Enum.map(
+          new_seen_params,
+          fn {k, v} -> {"#{k}", params[k] || seen_params[k]} end
+        ),
+        %{}
+      )
+
+    seen_params =
+      Enum.into(
+        Enum.map(
+          seen_params,
+          fn {k, v} -> {"#{k}", params[k] || new_seen_params[k]} end
+        ),
+        %{}
+      )
+
+    seen_params = Map.merge(seen_params, new_seen_params)
+
     form1 =
       if Map.get(params, "email") do
-        validate_form1(to_form(params), params)
+        validate_form1(to_form(seen_params), params)
       else
         form1
       end
 
     form2 =
       if !Map.get(params, "email") do
-        validate_form2(to_form(params), params)
+        validate_form2(to_form(seen_params), params)
       else
         form2
       end
 
-    {:noreply, assign(socket, form1: form1, form2: form2)}
+    IO.inspect([form1.errors, form2.errors])
+
+    {
+      :noreply,
+      assign(
+        socket,
+        form1: form1,
+        form2: form2,
+        seen_params: seen_params
+      )
+    }
   end
 
   def handle_event("save", params, socket) do
@@ -176,8 +224,8 @@ defmodule ModalExampleWeb.ModalExampleLive do
     |> put_error("zip", "Zip is required", check_field_isnt_blank("zip"))
   end
 
-  def validate(_form, params) do
-    to_form(params)
+  def validate(form, params) do
+    form
   end
 
   def put_error(form, field, message, condition) do
