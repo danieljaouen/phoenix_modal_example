@@ -11,10 +11,10 @@
     <.simple_form
       for={@form1}
       id="form1"
-      phx-target="ignore"
+      phx-change="validate"
       phx-submit="save"
     >
-      <.input field={@form1[:email]} phx-change="validate" type="email" label="Email" />
+      <.input field={@form1[:email]} type="email" label="Email" />
       <:actions>
         <.button phx-click={show_modal_1()}>Back</.button>
         <.button phx-click={show_modal_3()}>Next</.button>
@@ -24,18 +24,30 @@
 
   <div id="modal-3" class="hidden" phx-update="ignore">
     <h2>Welcome to the Multi-Part Modal Example Part 3!</h2>
+    <%= if @form1.errors || @form2.errors do %>
+      <div class="alert alert-danger">
+        <ul>
+          <%= for {field, message} <- @form1.errors do %>
+            <li><%= translate_error(message) %></li>
+          <% end %>
+          <%= for {field, message} <- @form2.errors do %>
+            <li><%= translate_error(message) %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <.simple_form
       for={@form2}
       id="form2"
-      phx-target="ignore"
+      phx-change="validate"
       phx-submit="save"
     >
-      <.input field={@form2[:full_name]} phx-change="validate" type="text" label="Full Name" />
-      <.input field={@form2[:address1]} phx-change="validate" type="text" label="Address 1" />
-      <.input field={@form2[:address2]} phx-change="validate" type="text" label="Address 2" />
-      <.input field={@form2[:city]} phx-change="validate" type="text" label="City" />
-      <.input field={@form2[:state]} phx-change="validate" type="text" label="State" />
-      <.input field={@form2[:zip]} phx-change="validate" type="text" label="Zip Code" />
+      <.input field={@form2[:full_name]} type="text" label="Full Name" />
+      <.input field={@form2[:address1]} type="text" label="Address 1" />
+      <.input field={@form2[:address2]} type="text" label="Address 2" />
+      <.input field={@form2[:city]} type="text" label="City" />
+      <.input field={@form2[:state]} type="text" label="State" />
+      <.input field={@form2[:zip]} type="text" label="Zip Code" />
       <:actions>
         <.button phx-click={show_modal_2()}>Back</.button>
         <.link patch={~p"/submit"}>
